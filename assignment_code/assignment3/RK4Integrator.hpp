@@ -8,7 +8,8 @@ template <class TSystem, class TState>
 class RK4Integrator : public IntegratorBase<TSystem, TState> {
 	float box_width_ = 2.f;
 	float box_height_ = 2.f;
-	float bound_damping_ = -0.5f;
+	float bound_damping_ = -0.75f;
+	float eps = 0.0f;
 
   TState Integrate(const TSystem& system,
                    const TState& state,
@@ -25,12 +26,15 @@ class RK4Integrator : public IntegratorBase<TSystem, TState> {
 			glm::vec3 p = new_state.positions[i];
 			if (p.x > box_width_/2. || p.x < -box_width_/2.) {
 				new_state.velocities[i].x *= bound_damping_;
+				new_state.positions[i].x = glm::clamp(new_state.positions[i].x, -box_width_/2.f+eps, box_width_/2.f-eps);
 			}
 			if (p.z > box_width_/2. || p.z < -box_width_/2.) {
 				new_state.velocities[i].z *= bound_damping_;
+				new_state.positions[i].z = glm::clamp(new_state.positions[i].z, -box_width_/2.f+eps, box_width_/2.f-eps);
 			}
 			if (p.y > box_height_/2. || p.y < -box_height_/2.) {
 				new_state.velocities[i].y *= bound_damping_;
+				new_state.positions[i].y = glm::clamp(new_state.positions[i].y, -box_height_/2.f+eps, box_height_/2.f-eps);
 			}
 		}
     return new_state;

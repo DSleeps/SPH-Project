@@ -137,7 +137,7 @@ void SimulationApp::SetupScene() {
   WaterSystem base;
   ParticleState state;
   
-  int particle_number = 700;
+  int particle_number = 1000;
 	for (int i = 0; i < particle_number; i++) {
 		float r_x = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
 		float r_y = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;

@@ -6,6 +6,7 @@
 #include "ParticleSystemNode.hpp"
 #include "SimpleCircleSystem.hpp"
 #include "PendulumSystem.hpp"
+#include "WaterSystem.hpp"
 #include "IntegratorFactory.hpp"
 
 #include "glm/gtx/string_cast.hpp"
@@ -130,50 +131,25 @@ void SimulationApp::SetupScene() {
   point_light_node->CreateComponent<LightComponent>(point_light);
   point_light_node->GetTransform().SetPosition(glm::vec3(0.0f, 2.0f, 4.f));
   root.AddChild(std::move(point_light_node));
-  
-  auto integrator_circle = 
-   IntegratorFactory::CreateIntegrator<SimpleCircleSystem, ParticleState>(integrator_type_);
-  SimpleCircleSystem base_circle;
-  ParticleState state_circle;
-  state_circle.positions.push_back(glm::vec3(0.1, 0.1, 0));
-  state_circle.velocities.push_back(glm::vec3());
-  auto particle_node_circle = 
-             make_unique<ParticleSystemNode<SimpleCircleSystem>>
-                        (std::move(integrator_circle), base_circle, state_circle, integration_step_);
-  particle_node_circle->GetTransform().SetPosition(glm::vec3(-1.f, 1.f, 0.f));
-  root.AddChild(std::move(particle_node_circle));
-  
-  auto integrator_p = 
-   IntegratorFactory::CreateIntegrator<PendulumSystem, ParticleState>(integrator_type_);
-  PendulumSystem base_p;
-  ParticleState state_p;
-  
-  base_p.AddParticle(state_p, 1.f, true, glm::vec3(0.f, 0.f, 0.f));
-  base_p.AddParticle(state_p, 1.f, false, glm::vec3(0.25f, -0.25f, 0.));
-  base_p.AddParticle(state_p, 1.f, false, glm::vec3(0.25f, -0.5f, 0.25f));
-  base_p.AddParticle(state_p, 1.f, false, glm::vec3(0.25f, -0.75f, -0.25));
-  base_p.AddSpring(0, 1, 0.5f, 30.75f);
-  base_p.AddSpring(1, 2, 0.5f, 30.75f);
-  base_p.AddSpring(2, 3, 0.5f, 30.75f);
-  
-  auto particle_node_p = 
-             make_unique<ParticleSystemNode<PendulumSystem>>
-                        (std::move(integrator_p), base_p, state_p, integration_step_);
-  particle_node_p->GetTransform().SetPosition(glm::vec3(0.f, 1.f, 0.f));
-  root.AddChild(std::move(particle_node_p));
-
-  auto integrator = 
-   IntegratorFactory::CreateIntegrator<PendulumSystem, ParticleState>(integrator_type_);
-  PendulumSystem base;
+ 	
+	auto integrator = 
+   IntegratorFactory::CreateIntegrator<WaterSystem, ParticleState>(integrator_type_);
+  WaterSystem base;
   ParticleState state;
   
-  int particle_width = 20;
-  int particle_height = 20;
-  ConstructCloth(base, state, 1.f, 1.f, particle_width, particle_height);
+  int particle_number = 700;
+	for (int i = 0; i < particle_number; i++) {
+		float r_x = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
+		float r_y = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
+		float r_z = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
+		
+		base.AddParticle(state, glm::vec3(r_x, r_y, r_z), glm::vec3(r_x, r_y, r_z));
+	}
+
   auto particle_node = 
-             make_unique<ParticleSystemNode<PendulumSystem>>
-                        (std::move(integrator), base, state, integration_step_, particle_width, particle_height);
-  particle_node->GetTransform().SetPosition(glm::vec3(1.f, 1.f, 0.f));
+             make_unique<ParticleSystemNode<WaterSystem>>
+                        (std::move(integrator), base, state, integration_step_);
+  particle_node->GetTransform().SetPosition(glm::vec3(0.f, 0.f, 0.f));
   root.AddChild(std::move(particle_node));
 }
 

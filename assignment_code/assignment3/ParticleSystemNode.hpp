@@ -103,11 +103,10 @@ ParticleSystemNode<TSystem>::ParticleSystemNode(
 
 template<class TSystem>
 void ParticleSystemNode<TSystem>::Update(double delta_time) {
-  int iter_times = ceil(delta_time/dt_);
-  for (int i = 0; i < iter_times; i++) {
-    state_ = integrator_->Integrate(base_, state_, cur_time_, dt_);
-  }
-  for (int i = 0; i < state_.positions.size(); i++) {
+  // Now just take one step everytime
+	state_ = integrator_->Integrate(base_, state_, cur_time_, dt_);
+  
+	for (int i = 0; i < state_.positions.size(); i++) {
     SceneNode* particle = particles[i];
     particle->GetTransform().SetPosition(state_.positions[i]);
   }

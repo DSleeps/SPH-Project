@@ -19,6 +19,9 @@ const static float POLY6 = 3.15f/(65.f*3.1415*pow(H, 9.f));
 const static float SPIKY_GRAD = -.45f/(3.1415*pow(H, 6.f));
 const static float VISC_LAP = .45f/(3.1415*pow(H, 6.f));
 
+// const static float POLY6 = 315.f/(65.f*3.1415*pow(H, 9.f));
+// const static float SPIKY_GRAD = -45.f/(3.1415*pow(H, 6.f));
+// const static float VISC_LAP = 45.f/(3.1415*pow(H, 6.f));
 class WaterSystem : public ParticleSystemBase {
  public:
 

@@ -5,6 +5,7 @@
 #include "gloo/debug/PrimitiveFactory.hpp"
 #include "gloo/components/RenderingComponent.hpp"
 #include "gloo/components/ShadingComponent.hpp"
+#include "gloo/components/MaterialComponent.hpp"
 #include "gloo/MeshLoader.hpp"
 #include "gloo/shaders/PhongShader.hpp"
 #include "gloo/InputManager.hpp"
@@ -28,7 +29,7 @@ class ParticleSystemNode : public SceneNode {
                      ParticleState state,
                      float dt, int particle_width, int particle_height);
   void Update(double delta_time) override;
-  
+
  private:
   void InitializeParticles();
   NormalArray CalculateNormals();
@@ -43,9 +44,10 @@ class ParticleSystemNode : public SceneNode {
   std::shared_ptr<VertexObject> sphere_mesh_;
   std::shared_ptr<PhongShader> shader_;
   std::shared_ptr<VertexObject> vertex_obj_;
+  std::shared_ptr<Material> material_comp_;
 
   std::vector<SceneNode*> particles;
-  
+
   int particle_width_;
   int particle_height_;
 
@@ -61,11 +63,16 @@ ParticleSystemNode<TSystem>::ParticleSystemNode(
     ParticleState state,
     float dt) : base_(base), state_(state) {
   integrator_ = std::move(integrator);
-  
+
   sphere_mesh_ = PrimitiveFactory::CreateSphere(0.055f, 25, 25);
   shader_ = std::make_shared<PhongShader>();
   vertex_obj_ = std::make_shared<VertexObject>();
-  
+
+  Material default_material(glm::vec3(0.1f, 0.1f, 0.5f),
+                                     glm::vec3(0.1f, 0.1f, 1.0f),
+                                     glm::vec3(0.4f, 0.4f, 0.4f), 20.0f);
+  material_comp_ = std::make_shared<Material>(default_material);
+
   original_pos_ = state.positions;
   original_vel_ = state.velocities;
 
@@ -83,14 +90,14 @@ ParticleSystemNode<TSystem>::ParticleSystemNode(
     ParticleState state,
     float dt, int particle_width, int particle_height) : base_(base), state_(state) {
   integrator_ = std::move(integrator);
-  
+
   sphere_mesh_ = PrimitiveFactory::CreateSphere(0.055f, 25, 25);
   shader_ = std::make_shared<PhongShader>();
   vertex_obj_ = std::make_shared<VertexObject>();
 
   original_pos_ = state.positions;
   original_vel_ = state.velocities;
-  
+
   particle_width_ = particle_width;
   particle_height_ = particle_height;
 
@@ -105,7 +112,7 @@ template<class TSystem>
 void ParticleSystemNode<TSystem>::Update(double delta_time) {
   // Now just take one step everytime
 	state_ = integrator_->Integrate(base_, state_, cur_time_, dt_);
-  
+
 	for (int i = 0; i < state_.positions.size(); i++) {
     SceneNode* particle = particles[i];
     particle->GetTransform().SetPosition(state_.positions[i]);
@@ -124,7 +131,7 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
       prev_released = true;
     }
   }
-  
+
 }
 
 template<class TSystem>
@@ -134,6 +141,8 @@ void ParticleSystemNode<TSystem>::InitializeParticles() {
     if (!cloth_) {
       particle_node->CreateComponent<ShadingComponent>(shader_);
       particle_node->CreateComponent<RenderingComponent>(sphere_mesh_);
+      particle_node->CreateComponent<MaterialComponent>(material_comp_);
+
     }
     particles.push_back(particle_node.get());
     AddChild(std::move(particle_node));
@@ -155,7 +164,7 @@ NormalArray ParticleSystemNode<TSystem>::CalculateNormals() {
   for (int i = 0; i < positions.size(); i++) {
     normals.push_back(glm::vec3());
   }
-  
+
   for (int i = 0; i < indices.size(); i += 3) {
     auto p1 = positions[indices[i]];
     auto p2 = positions[indices[i+1]];
@@ -182,7 +191,7 @@ void ParticleSystemNode<TSystem>::DrawCloth() {
       // Update the position and the normals
       SceneNode* particle = particles[x + particle_width_*y];
       positions->push_back(particle->GetTransform().GetPosition());
-      
+
       //Update the indices
       if (x != particle_width_-1 && y != particle_height_-1) {
         indices->push_back(y*(particle_width_) + x);

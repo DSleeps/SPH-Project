@@ -5,6 +5,7 @@
 #include "gloo/debug/PrimitiveFactory.hpp"
 #include "gloo/components/RenderingComponent.hpp"
 #include "gloo/components/ShadingComponent.hpp"
+#include "gloo/components/MaterialComponent.hpp"
 #include "gloo/MeshLoader.hpp"
 #include "gloo/shaders/PhongShader.hpp"
 #include "gloo/InputManager.hpp"
@@ -25,7 +26,7 @@ class ParticleSystemNode : public SceneNode {
                      ParticleState state,
                      float dt);
   void Update(double delta_time) override;
-  
+
  private:
   void InitializeParticles();
   NormalArray CalculateNormals();
@@ -40,6 +41,7 @@ class ParticleSystemNode : public SceneNode {
   std::shared_ptr<VertexObject> sphere_mesh_;
   std::shared_ptr<PhongShader> shader_;
   std::shared_ptr<VertexObject> vertex_obj_;
+  std::shared_ptr<Material> material_comp_;
 
   std::vector<SceneNode*> particles;
 
@@ -59,25 +61,28 @@ ParticleSystemNode<TSystem>::ParticleSystemNode(
     ParticleState state,
     float dt) : base_(base), state_(state) {
   integrator_ = std::move(integrator);
-  
+
   sphere_mesh_ = PrimitiveFactory::CreateSphere(0.055f, 25, 25);
   shader_ = std::make_shared<PhongShader>();
   vertex_obj_ = std::make_shared<VertexObject>();
-	
+
+  Material default_material(glm::vec3(0.1f, 0.1f, 0.5f),
+                                     glm::vec3(0.1f, 0.1f, 1.0f),
+                                     glm::vec3(0.4f, 0.4f, 0.4f), 20.0f);
+  material_comp_ = std::make_shared<Material>(default_material);
   original_pos_ = state.positions;
   original_vel_ = state.velocities;
 	
 	grid_ = Grid(glm::vec3(-box_width_/2.f, -box_height_/2.f, -box_width_/2.f),
 							 glm::vec3(box_width_/2.f, box_height_/2.f, box_width_/2.f));
 
-
   cur_time_ = 0.;
   dt_ = dt;
 
   InitializeParticles();
- 	DrawWater();
+	DrawWater();
   CreateComponent<ShadingComponent>(shader_);
-	CreateComponent<RenderingComponent>(vertex_obj_);
+  CreateComponent<RenderingComponent>(vertex_obj_);
 }
 
 template<class TSystem>
@@ -85,7 +90,6 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
   // Now just take one step everytime
 	state_ = integrator_->Integrate(base_, state_, cur_time_, dt_);
  	DrawWater();
-	// grid_.CalculateBlobs(state_.positions);
 
 	for (int i = 0; i < state_.positions.size(); i++) {
     SceneNode* particle = particles[i];
@@ -114,7 +118,7 @@ NormalArray ParticleSystemNode<TSystem>::CalculateNormals() {
   for (int i = 0; i < positions.size(); i++) {
     normals.push_back(glm::vec3());
   }
-  
+
   for (int i = 0; i < indices.size(); i += 3) {
     auto p1 = positions[indices[i]];
     auto p2 = positions[indices[i+1]];

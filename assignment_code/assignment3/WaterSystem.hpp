@@ -18,6 +18,7 @@ const static float VISC = 2.50f; // viscosity constant
 const static float POLY6 = 3.15f/(65.f*3.1415*pow(H, 9.f));
 const static float SPIKY_GRAD = -.45f/(3.1415*pow(H, 6.f));
 const static float VISC_LAP = .45f/(3.1415*pow(H, 6.f));
+const static glm::vec3 GRAVITY = glm::vec3(0.f, -20.f, 0.f);
 
 // const static float POLY6 = 315.f/(65.f*3.1415*pow(H, 9.f));
 // const static float SPIKY_GRAD = -45.f/(3.1415*pow(H, 6.f));
@@ -38,7 +39,6 @@ class WaterSystem : public ParticleSystemBase {
 											 std::vector<float> pressures, 
 											 std::vector<float> rhos, 
 											 std::vector<glm::vec3>& forces) const;
-  glm::vec3 g_ = glm::vec3(0., -2., 0);
   float drag_constant_ = 0.3;
 };
 }  // namespace GLOO

@@ -34,9 +34,9 @@ class Grid {
 	glm::vec3 origin_;
 
 	// The number of grid cells in the box in each direction
-	int grid_x_res_ = 100;
-	int grid_y_res_ = 100;
-	int grid_z_res_ = 100;
+	int grid_x_res_ = 200;
+	int grid_y_res_ = 200;
+	int grid_z_res_ = 200;
 	
 	// The size of each cell. This will be calculated based on the
 	// size of the box.
@@ -45,7 +45,7 @@ class Grid {
 	float cell_size_z_;
 	
 	// The radius of each point
-	float radius_ = 0.1f;
+	float radius_ = 0.02f;
 	
 	// The range (number of radiuses) at which to check the influence of
 	// each point as radius * range

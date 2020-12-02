@@ -70,7 +70,7 @@ void WaterSystem::CalculateForces(const ParticleState& state,
 				visc += VISC*MASS*(state.velocities[j] - state.velocities[i])/rhos[j] * VISC_LAP*(H-d);
 			}
 		}
-		forces.push_back(pressure + visc + g_ * rhos[i]);
+		forces.push_back(pressure + visc + GRAVITY * rhos[i]);
 	}
 
 }

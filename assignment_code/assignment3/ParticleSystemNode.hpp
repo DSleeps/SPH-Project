@@ -53,6 +53,7 @@ class ParticleSystemNode : public SceneNode {
 	Grid grid_;
   
   float dt_;
+	float fps_ = 1.f/30.f;
   float cur_time_;
 	
 	float box_width_ = 2.f; //TODO: This is also hardcoded in RK4 integrator
@@ -112,7 +113,7 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
 
 	BYTE* pixels = new BYTE[3 * width_ * height_];
 	glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-	// stbi_write_bmp(filename.c_str(), width, height, 3, pixels);
+	stbi_write_bmp(filename.c_str(), width, height, 3, pixels);
 
 	delete [] pixels;	
 

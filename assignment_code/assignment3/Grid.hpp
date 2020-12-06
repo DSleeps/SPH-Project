@@ -45,7 +45,7 @@ class Grid {
 	float cell_size_z_;
 
 	// The radius of each point
-	float radius_ = 0.04f;
+	float radius_ = 0.02f;
 
 	// The range (number of radiuses) at which to check the influence of
 	// each point as radius * range

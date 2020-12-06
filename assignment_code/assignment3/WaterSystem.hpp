@@ -11,7 +11,7 @@ const static float REST_DENS = 10.f; // rest density
 const static float GAS_CONST = 20.f; // const for equation of state
 const static float H = .16f; // kernel radius
 const static float HSQ = H*H; // radius^2 for optimization
-const static float MASS = .65f; // assume all particles have the same mass
+const static float MASS = 1.65f; // assume all particles have the same mass
 const static float VISC = 2.50f; // viscosity constant
 
 // smoothing kernels defined in Müller and their gradients

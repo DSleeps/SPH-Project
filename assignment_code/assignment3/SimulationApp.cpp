@@ -41,75 +41,6 @@ int IndexOf(int x, int y, int particle_x) {
   return x + y * particle_x;
 }
 
-void ConstructCloth(PendulumSystem& base, ParticleState& state, float width, float height, int particle_x, int particle_y) {
-  float mass = 1.f;
-
-  // Start by initializing all of the particles in the right place
-  for (int x = 0; x < particle_x; x++) {
-    for (int y = 0; y < particle_y; y++) {
-      glm::vec3 position = glm::vec3(width*x/(particle_x-1), -height*y/(particle_y-1), (height*y/(particle_y-1))/4);
-      if (y == 0 && (x == 0 || x == (particle_x-1))) {
-        base.AddParticle(state, mass, true, position);
-      } else {
-        base.AddParticle(state, mass, false, position);
-      }
-    }
-  }
-
-  // Add structural springs
-  float struct_width_rest = width/(particle_x-1);
-  float struct_height_rest = height/(particle_y-1);
-  float struct_k = 1000.f;
-  for (int x = 0; x < particle_x; x++) {
-    for (int y = 0; y < particle_y; y++) {
-      int p1 = IndexOf(x, y, particle_x);
-      int p2 = IndexOf(x+1, y, particle_x);
-      int p3 = IndexOf(x, y+1, particle_x);
-      if (x != (particle_x-1)) {
-        base.AddSpring(p1, p2, struct_width_rest, struct_k);
-      }
-      if (y != (particle_y-1)) {
-        base.AddSpring(p1, p3, struct_height_rest, struct_k);
-      }
-    }
-  }
-
-  // Add shear springs
-  float shear_rest = pow(pow(width/(particle_x-1),2) + pow(height/(particle_y-1),2), 0.5f);
-  float shear_k = 1000.f;
-  for (int x = 0; x < particle_x; x++) {
-    for (int y = 0; y < particle_y-1; y++) {
-      int p1 = IndexOf(x, y, particle_x);
-      int p2 = IndexOf(x+1, y+1, particle_x);
-      int p3 = IndexOf(x-1, y+1, particle_x);
-      if (x != (particle_x - 1)) {
-        base.AddSpring(p1, p2, shear_rest, shear_k);
-      }
-      if (x != 0) {
-        base.AddSpring(p1, p3, shear_rest, shear_k);
-      }
-    }
-  }
-
-  // Add flex springs
-  float flex_width_rest = 2 * width/(particle_x-1);
-  float flex_height_rest = 2 * height/(particle_y-1);
-  float flex_k = 1000.f;
-  for (int x = 0; x < particle_x; x++) {
-    for (int y = 0; y < particle_y; y++) {
-      int p1 = IndexOf(x, y, particle_x);
-      int p2 = IndexOf(x+2, y, particle_x);
-      int p3 = IndexOf(x, y+2, particle_x);
-      if (x < (particle_x - 2)) {
-        base.AddSpring(p1, p2, flex_width_rest, flex_k);
-      }
-      if (y < (particle_y - 2)) {
-        base.AddSpring(p1, p3, flex_height_rest, flex_k);
-      }
-    }
-  }
-}
-
 void SimulationApp::SetupScene() {
   SceneNode& root = scene_->GetRootNode();
 
@@ -137,7 +68,7 @@ void SimulationApp::SetupScene() {
   WaterSystem base;
   ParticleState state;
 
-  int particle_number = 1000;
+  int particle_number = 2000;
 	for (int i = 0; i < particle_number; i++) {
 		float r_x = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
 		float r_y = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;

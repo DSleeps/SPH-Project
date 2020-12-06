@@ -62,7 +62,7 @@ void WaterSystem::CalculateForces(const ParticleState& state,
 			if (i == j) {
 				continue;
 			}
-			glm::vec3 d_vec = state.positions[j] - state.positions[i];
+			glm::vec3 d_vec = state.positions[i] - state.positions[j];
 			float d = pow(glm::length(d_vec), 1.f);
 			
 			if (d < H) {

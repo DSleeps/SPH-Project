@@ -113,7 +113,7 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
 
 	BYTE* pixels = new BYTE[3 * width_ * height_];
 	glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-	stbi_write_bmp(filename.c_str(), width, height, 3, pixels);
+	stbi_write_bmp(filename.c_str(), width_, height_, 3, pixels);
 
 	delete [] pixels;	
 

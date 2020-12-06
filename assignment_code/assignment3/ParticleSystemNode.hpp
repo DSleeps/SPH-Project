@@ -51,18 +51,18 @@ class ParticleSystemNode : public SceneNode {
   std::vector<SceneNode*> particles;
 
 	Grid grid_;
-  
+
   float dt_;
 	float fps_ = 1.f/30.f;
 	float fps_pos_ = 0.f;
 
   float cur_time_;
-	
+
 	float box_width_ = 2.f; //TODO: This is also hardcoded in RK4 integrator
 	float box_height_ = 2.f;
 
 	int frame_ = 0;
-	
+
 	int width_;
 	int height_;
 };
@@ -85,13 +85,13 @@ ParticleSystemNode<TSystem>::ParticleSystemNode(
   material_comp_ = std::make_shared<Material>(default_material);
   original_pos_ = state.positions;
   original_vel_ = state.velocities;
-	
+
 	grid_ = Grid(glm::vec3(-box_width_/2.f, -box_height_/2.f, -box_width_/2.f),
 							 glm::vec3(box_width_/2.f, box_height_/2.f, box_width_/2.f));
 
   cur_time_ = 0.;
   dt_ = dt;
-	
+
 	GLint dims[4] = {0};
 	glGetIntegerv(GL_VIEWPORT, dims);
 	width_ = (int)dims[2];
@@ -101,6 +101,7 @@ ParticleSystemNode<TSystem>::ParticleSystemNode(
 	DrawWater();
   CreateComponent<ShadingComponent>(shader_);
   CreateComponent<RenderingComponent>(vertex_obj_);
+  CreateComponent<MaterialComponent>(material_comp_);
 }
 
 template<class TSystem>
@@ -108,7 +109,7 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
   // Now just take one step everytime
 	state_ = integrator_->Integrate(base_, state_, cur_time_, dt_);
  	DrawWater();
-	
+
 	if (fps_pos_ > fps_) {
 		// Take a screenshot
 		std::string filename = "SimScreenshots/Sim" + std::to_string(frame_) + ".bmp";
@@ -118,11 +119,11 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
 		glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 		stbi_write_bmp(filename.c_str(), width_, height_, 3, pixels);
 
-		delete [] pixels;	
+		delete [] pixels;
 		fps_pos_ = fps_pos_ - fps_;
 	} else {
 		fps_pos_ += dt_;
-	}	
+	}
 
 	for (int i = 0; i < state_.positions.size(); i++) {
     SceneNode* particle = particles[i];
@@ -136,6 +137,7 @@ void ParticleSystemNode<TSystem>::InitializeParticles() {
     auto particle_node = make_unique<SceneNode>();
     particle_node->CreateComponent<ShadingComponent>(shader_);
     // particle_node->CreateComponent<RenderingComponent>(sphere_mesh_);
+    particle_node->CreateComponent<MaterialComponent>(material_comp_);
     particles.push_back(particle_node.get());
     AddChild(std::move(particle_node));
   }
@@ -174,12 +176,12 @@ void ParticleSystemNode<TSystem>::DrawWater() {
 	p_array.clear();
 	IndexArray i_array;
 	i_array.clear();
-	
+
 	grid_.CalculateBlobs(state_.positions, p_array, i_array);
-	
+
 	auto positions = make_unique<PositionArray>(p_array);
   auto indices = make_unique<IndexArray>(i_array);
-  
+
 	vertex_obj_->UpdatePositions(std::move(positions));
   vertex_obj_->UpdateIndices(std::move(indices));
   vertex_obj_->UpdateNormals(std::move(make_unique<NormalArray>(CalculateNormals())));

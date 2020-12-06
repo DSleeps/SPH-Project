@@ -55,7 +55,7 @@ void ConstructCloth(PendulumSystem& base, ParticleState& state, float width, flo
       }
     }
   }
-  
+
   // Add structural springs
   float struct_width_rest = width/(particle_x-1);
   float struct_height_rest = height/(particle_y-1);
@@ -73,7 +73,7 @@ void ConstructCloth(PendulumSystem& base, ParticleState& state, float width, flo
       }
     }
   }
-  
+
   // Add shear springs
   float shear_rest = pow(pow(width/(particle_x-1),2) + pow(height/(particle_y-1),2), 0.5f);
   float shear_k = 1000.f;
@@ -129,24 +129,24 @@ void SimulationApp::SetupScene() {
   point_light->SetAttenuation(glm::vec3(1.0f, 0.09f, 0.032f));
   auto point_light_node = make_unique<SceneNode>();
   point_light_node->CreateComponent<LightComponent>(point_light);
-  point_light_node->GetTransform().SetPosition(glm::vec3(0.0f, 2.0f, 4.f));
+  point_light_node->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
   root.AddChild(std::move(point_light_node));
- 	
-	auto integrator = 
+
+	auto integrator =
    IntegratorFactory::CreateIntegrator<WaterSystem, ParticleState>(integrator_type_);
   WaterSystem base;
   ParticleState state;
-  
+
   int particle_number = 1000;
 	for (int i = 0; i < particle_number; i++) {
 		float r_x = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
 		float r_y = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
 		float r_z = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
-		
+
 		base.AddParticle(state, glm::vec3(r_x, r_y, r_z), glm::vec3(r_x, r_y, r_z));
 	}
 
-  auto particle_node = 
+  auto particle_node =
              make_unique<ParticleSystemNode<WaterSystem>>
                         (std::move(integrator), base, state, integration_step_);
   particle_node->GetTransform().SetPosition(glm::vec3(0.f, 0.f, 0.f));

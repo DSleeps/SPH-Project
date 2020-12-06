@@ -54,6 +54,8 @@ class ParticleSystemNode : public SceneNode {
   
   float dt_;
 	float fps_ = 1.f/30.f;
+	float fps_pos_ = 0.f;
+
   float cur_time_;
 	
 	float box_width_ = 2.f; //TODO: This is also hardcoded in RK4 integrator
@@ -107,15 +109,20 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
 	state_ = integrator_->Integrate(base_, state_, cur_time_, dt_);
  	DrawWater();
 	
-	// Take a screenshot
-	std::string filename = "SimScreenshots/Sim" + std::to_string(frame_) + ".bmp";
-	frame_ += 1;
+	if (fps_pos_ > fps_) {
+		// Take a screenshot
+		std::string filename = "SimScreenshots/Sim" + std::to_string(frame_) + ".bmp";
+		frame_ += 1;
 
-	BYTE* pixels = new BYTE[3 * width_ * height_];
-	glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-	stbi_write_bmp(filename.c_str(), width_, height_, 3, pixels);
+		BYTE* pixels = new BYTE[3 * width_ * height_];
+		glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+		stbi_write_bmp(filename.c_str(), width_, height_, 3, pixels);
 
-	delete [] pixels;	
+		delete [] pixels;	
+		fps_pos_ = fps_pos_ - fps_;
+	} else {
+		fps_pos_ += dt_;
+	}	
 
 	for (int i = 0; i < state_.positions.size(); i++) {
     SceneNode* particle = particles[i];

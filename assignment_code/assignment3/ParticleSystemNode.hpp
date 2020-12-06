@@ -15,8 +15,13 @@
 #include "ParticleState.hpp"
 #include "SimpleCircleSystem.hpp"
 #include "Grid.hpp"
+#include "stb_image.h"
+#include "stb_image_write.h"
 
 namespace GLOO {
+
+typedef std::bitset<8> BYTE;
+
 template <class TSystem>
 class ParticleSystemNode : public SceneNode {
  public:
@@ -52,6 +57,8 @@ class ParticleSystemNode : public SceneNode {
 	
 	float box_width_ = 2.f; //TODO: This is also hardcoded in RK4 integrator
 	float box_height_ = 2.f;
+
+	int frame_ = 0;
 };
 
 template<class TSystem>
@@ -90,6 +97,21 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
   // Now just take one step everytime
 	state_ = integrator_->Integrate(base_, state_, cur_time_, dt_);
  	DrawWater();
+	
+	// Take a screenshot
+	GLint dims[4] = {0};
+	glGetIntegerv(GL_VIEWPORT, dims);
+	int width = (int)dims[2];
+	int height = (int)dims[3];
+	
+	std::string filename = "SimScreenshots/Sim" + std::to_string(frame_) + ".bmp";
+	frame_ += 1;
+
+	BYTE* pixels = new BYTE[3 * width * height];
+	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	stbi_write_bmp(filename.c_str(), width, height, 3, pixels);
+
+	delete [] pixels;	
 
 	for (int i = 0; i < state_.positions.size(); i++) {
     SceneNode* particle = particles[i];

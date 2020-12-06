@@ -59,6 +59,9 @@ class ParticleSystemNode : public SceneNode {
 	float box_height_ = 2.f;
 
 	int frame_ = 0;
+	
+	int width_;
+	int height_;
 };
 
 template<class TSystem>
@@ -85,6 +88,11 @@ ParticleSystemNode<TSystem>::ParticleSystemNode(
 
   cur_time_ = 0.;
   dt_ = dt;
+	
+	GLint dims[4] = {0};
+	glGetIntegerv(GL_VIEWPORT, dims);
+	width_ = (int)dims[2];
+	height_ = (int)dims[3];
 
   InitializeParticles();
 	DrawWater();
@@ -99,17 +107,12 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
  	DrawWater();
 	
 	// Take a screenshot
-	GLint dims[4] = {0};
-	glGetIntegerv(GL_VIEWPORT, dims);
-	int width = (int)dims[2];
-	int height = (int)dims[3];
-	
 	std::string filename = "SimScreenshots/Sim" + std::to_string(frame_) + ".bmp";
 	frame_ += 1;
 
-	BYTE* pixels = new BYTE[3 * width * height];
-	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-	stbi_write_bmp(filename.c_str(), width, height, 3, pixels);
+	BYTE* pixels = new BYTE[3 * width_ * height_];
+	glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	// stbi_write_bmp(filename.c_str(), width, height, 3, pixels);
 
 	delete [] pixels;	
 

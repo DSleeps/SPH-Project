@@ -16,20 +16,20 @@ class Grid {
 	// opposite corner on the top. This defines the whole boundary
 	// of the box.
 	Grid() {}
-	Grid(glm::vec3 p1, glm::vec3 p2);	
+	Grid(glm::vec3 p1, glm::vec3 p2);
 	void CalculateBlobs(std::vector<glm::vec3> positions,
 											std::vector<glm::vec3>& vertices,
 											std::vector<unsigned int>& indices);
 
  private:
  	// This calculates a single primitive of a given grid cell
-	void CalculatePrimitive(int x, int y, int z, 
+	void CalculatePrimitive(int x, int y, int z,
 													std::vector<glm::vec3>& vertices,
 													std::vector<unsigned int>& indices);
 
  	// All of the values of each corner
  	std::vector<std::vector<std::vector<float>>> values_;
-	
+
 	// This will be the origin of the grid box, the bottom corner
 	glm::vec3 origin_;
 
@@ -37,16 +37,16 @@ class Grid {
 	int grid_x_res_ = 200;
 	int grid_y_res_ = 200;
 	int grid_z_res_ = 200;
-	
+
 	// The size of each cell. This will be calculated based on the
 	// size of the box.
 	float cell_size_x_;
 	float cell_size_y_;
 	float cell_size_z_;
-	
+
 	// The radius of each point
-	float radius_ = 0.02f;
-	
+	float radius_ = 0.04f;
+
 	// The range (number of radiuses) at which to check the influence of
 	// each point as radius * range
 	int range_ = 2;

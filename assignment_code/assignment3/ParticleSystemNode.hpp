@@ -79,8 +79,8 @@ ParticleSystemNode<TSystem>::ParticleSystemNode(
   shader_ = std::make_shared<PhongShader>();
   vertex_obj_ = std::make_shared<VertexObject>();
 
-  Material default_material(glm::vec3(0.1f, 0.1f, 0.5f),
-                                     glm::vec3(0.1f, 0.1f, 1.0f),
+  Material default_material(glm::vec3(0.0f, 0.0f, 1.f),
+                                     glm::vec3(0.0f, 0.0f, 1.0f),
                                      glm::vec3(0.4f, 0.4f, 0.4f), 20.0f);
   material_comp_ = std::make_shared<Material>(default_material);
   original_pos_ = state.positions;

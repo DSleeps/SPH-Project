@@ -109,8 +109,12 @@ void Grid::CalculateBlobs(std::vector<glm::vec3> positions,
 	for (int x = 0; x < grid_x_res_; x++) {
 		for (int y = 0; y < grid_y_res_; y++) {
 			for (int z = 0; z < grid_z_res_; z++) {
-				if (values_[x][y][z] >= 1.f)
-					CalculatePrimitive(x, y, z, vertices, indices);
+				if (smooth_) {
+					CalculateSmooth(x, y, z, vertices, indices);
+				} else {
+					if (values_[x][y][z] >= 1.f)
+						CalculatePrimitive(x, y, z, vertices, indices);
+				}
 			}
 		}
 	}
@@ -149,8 +153,140 @@ void Grid::CalculatePrimitive(int x, int y, int z,
 			indices.push_back(vert_size-1);
 		}
 	}
-	
+}
 
+typedef struct {
+	glm::vec3 p[8];
+	double val[8];
+} GRIDCELL;
+
+void Grid::CalculateSmooth(int x, int y, int z,
+													 std::vector<glm::vec3>& vertices,
+													 std::vector<unsigned int>& indices) {
+	// We don't need to check any of the edges
+	if (x == grid_x_res_ - 1 || y == grid_y_res_ - 1 || z == grid_z_res_ - 1)
+		return;
+
+	int cubeindex;
+	glm::vec3 vertlist[12];
+	float isolevel = 1.f;
+	
+	GRIDCELL grid;
+	// Manually specify each corner in the grid
+	grid.val[0] = (double) values_[x][y][z+1];
+	grid.p[0] = glm::vec3((x) * cell_size_x_, 
+												(y) * cell_size_y_, 
+												(z+1) * cell_size_z_);
+	grid.val[1] = (double) values_[x+1][y][z+1];
+	grid.p[1] = glm::vec3((x+1) * cell_size_x_, 
+												(y) * cell_size_y_, 
+												(z+1) * cell_size_z_);
+	grid.val[2] = (double) values_[x+1][y][z];
+	grid.p[2] = glm::vec3((x+1) * cell_size_x_, 
+												(y) * cell_size_y_, 
+												(z) * cell_size_z_);
+	grid.val[3] = (double) values_[x][y][z];
+	grid.p[3] = glm::vec3((x) * cell_size_x_, 
+												(y) * cell_size_y_, 
+												(z) * cell_size_z_);
+	grid.val[4] = (double) values_[x][y+1][z+1];
+	grid.p[4] = glm::vec3((x) * cell_size_x_, 
+												(y+1) * cell_size_y_, 
+												(z+1) * cell_size_z_);
+	grid.val[5] = (double) values_[x+1][y+1][z+1];
+	grid.p[5] = glm::vec3((x+1) * cell_size_x_, 
+												(y+1) * cell_size_y_, 
+												(z+1) * cell_size_z_);
+	grid.val[6] = (double) values_[x+1][y+1][z];
+	grid.p[6] = glm::vec3((x+1) * cell_size_x_, 
+												(y+1) * cell_size_y_, 
+												(z) * cell_size_z_);
+	grid.val[7] = (double) values_[x][y+1][z];
+	grid.p[7] = glm::vec3((x) * cell_size_x_, 
+												(y+1) * cell_size_y_, 
+												(z) * cell_size_z_);
+	
+	cubeindex = 0;
+	if (grid.val[0] < isolevel) cubeindex |= 1;
+	if (grid.val[1] < isolevel) cubeindex |= 2;
+	if (grid.val[2] < isolevel) cubeindex |= 4;
+	if (grid.val[3] < isolevel) cubeindex |= 8;
+	if (grid.val[4] < isolevel) cubeindex |= 16;
+	if (grid.val[5] < isolevel) cubeindex |= 32;
+	if (grid.val[6] < isolevel) cubeindex |= 64;
+	if (grid.val[7] < isolevel) cubeindex |= 128;
+	
+	// This means that none of the corners are in
+	if (edgeTable[cubeindex] == 0)
+		return;
+
+	if (edgeTable[cubeindex] & 1)
+		vertlist[0] =
+		VertexInterp(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
+	if (edgeTable[cubeindex] & 2)
+		vertlist[1] =
+		VertexInterp(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
+	if (edgeTable[cubeindex] & 4)
+		vertlist[2] =
+		VertexInterp(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
+	if (edgeTable[cubeindex] & 8)
+		vertlist[3] =
+		VertexInterp(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
+	if (edgeTable[cubeindex] & 16)
+		vertlist[4] =
+		VertexInterp(isolevel,grid.p[4],grid.p[5],grid.val[4],grid.val[5]);
+	if (edgeTable[cubeindex] & 32)
+		vertlist[5] =
+		VertexInterp(isolevel,grid.p[5],grid.p[6],grid.val[5],grid.val[6]);
+	if (edgeTable[cubeindex] & 64)
+		vertlist[6] =
+		VertexInterp(isolevel,grid.p[6],grid.p[7],grid.val[6],grid.val[7]);
+	if (edgeTable[cubeindex] & 128)
+		vertlist[7] =
+		VertexInterp(isolevel,grid.p[7],grid.p[4],grid.val[7],grid.val[4]);
+	if (edgeTable[cubeindex] & 256)
+		vertlist[8] =
+		VertexInterp(isolevel,grid.p[0],grid.p[4],grid.val[0],grid.val[4]);
+	if (edgeTable[cubeindex] & 512)
+		vertlist[9] =
+		VertexInterp(isolevel,grid.p[1],grid.p[5],grid.val[1],grid.val[5]);
+	if (edgeTable[cubeindex] & 1024)
+		vertlist[10] =
+		VertexInterp(isolevel,grid.p[2],grid.p[6],grid.val[2],grid.val[6]);
+	if (edgeTable[cubeindex] & 2048)
+		vertlist[11] =
+		VertexInterp(isolevel,grid.p[3],grid.p[7],grid.val[3],grid.val[7]);
+
+	// Create the triangle
+	for (int i = 0; triTable[cubeindex][i] != -1; i += 3) {
+		int vertex_size = vertices.size();
+		vertices.push_back(vertlist[triTable[cubeindex][i]] + origin_);
+		vertices.push_back(vertlist[triTable[cubeindex][i+1]] + origin_);
+		vertices.push_back(vertlist[triTable[cubeindex][i+2]] + origin_);
+		indices.push_back(vertex_size);
+		indices.push_back(vertex_size+1);
+		indices.push_back(vertex_size+2);
+	}
+}
+
+glm::vec3 Grid::VertexInterp(double isolevel, glm::vec3 p1, glm::vec3 p2, 
+								 			 			 double valp1, double valp2) {
+	double mu;
+	glm::vec3 p;
+
+	if (abs(isolevel-valp1) < 0.00001)
+		return(p1);
+	if (abs(isolevel-valp2) < 0.00001)
+		return(p2);
+	if (abs(valp1-valp2) < 0.00001)
+		return(p1);
+	
+	mu = (isolevel - valp1) / (valp2 - valp1);
+	p.x = p1.x + mu * (p2.x - p1.x);
+	p.y = p1.y + mu * (p2.y - p1.y);
+	p.z = p1.z + mu * (p2.z - p1.z);
+
+	return p;
 }
 
 }

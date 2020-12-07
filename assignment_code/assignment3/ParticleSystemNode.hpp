@@ -13,7 +13,6 @@
 #include "IntegratorBase.hpp"
 #include "ParticleSystemBase.hpp"
 #include "ParticleState.hpp"
-#include "SimpleCircleSystem.hpp"
 #include "Grid.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
@@ -58,7 +57,7 @@ class ParticleSystemNode : public SceneNode {
 
   float cur_time_;
 
-	float box_width_ = 2.f; //TODO: This is also hardcoded in RK4 integrator
+	float box_width_ = 2.f; //TODO: This is also hardcoded in RK4 integrator and WaterSystem
 	float box_height_ = 2.f;
 
 	int frame_ = 0;
@@ -135,9 +134,9 @@ template<class TSystem>
 void ParticleSystemNode<TSystem>::InitializeParticles() {
   for (int i = 0; i < state_.positions.size(); i++) {
     auto particle_node = make_unique<SceneNode>();
-    particle_node->CreateComponent<ShadingComponent>(shader_);
+    // particle_node->CreateComponent<ShadingComponent>(shader_);
     // particle_node->CreateComponent<RenderingComponent>(sphere_mesh_);
-    particle_node->CreateComponent<MaterialComponent>(material_comp_);
+    // particle_node->CreateComponent<MaterialComponent>(material_comp_);
     particles.push_back(particle_node.get());
     AddChild(std::move(particle_node));
   }

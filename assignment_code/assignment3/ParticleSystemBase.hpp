@@ -10,7 +10,7 @@ class ParticleSystemBase {
   }
 
   virtual ParticleState ComputeTimeDerivative(const ParticleState& state,
-                                              float time) const = 0;
+                                              float time) = 0;
 };
 }  // namespace GLOO
 

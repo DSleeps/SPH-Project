@@ -1,11 +1,7 @@
 #include "SimulationApp.hpp"
 
-#include "ForwardEulerIntegrator.hpp"
-#include "TrapezoidIntegrator.hpp"
 #include "RK4Integrator.hpp"
 #include "ParticleSystemNode.hpp"
-#include "SimpleCircleSystem.hpp"
-#include "PendulumSystem.hpp"
 #include "WaterSystem.hpp"
 #include "IntegratorFactory.hpp"
 

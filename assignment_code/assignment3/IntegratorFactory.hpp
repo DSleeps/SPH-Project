@@ -2,7 +2,6 @@
 #define INTEGRATOR_FACTORY_H_
 
 #include "IntegratorBase.hpp"
-#include "ForwardEulerIntegrator.hpp"
 
 #include <stdexcept>
 
@@ -16,11 +15,7 @@ class IntegratorFactory {
   template <class TSystem, class TState>
   static std::unique_ptr<IntegratorBase<TSystem, TState>> CreateIntegrator(
       IntegratorType type) {
-    if (type == IntegratorType::Euler)
-      return make_unique<ForwardEulerIntegrator<TSystem, TState>>();
-    else if (type == IntegratorType::Trapezoidal)
-      return make_unique<TrapezoidIntegrator<TSystem, TState>>();
-    else if (type == IntegratorType::RK4)
+    if (type == IntegratorType::RK4)
       return make_unique<RK4Integrator<TSystem, TState>>();
     return nullptr;
   }

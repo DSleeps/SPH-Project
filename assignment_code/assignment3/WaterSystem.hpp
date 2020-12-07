@@ -3,6 +3,7 @@
 
 #include "ParticleState.hpp"
 #include "ParticleSystemBase.hpp"
+#include <set>
 
 namespace GLOO {
 
@@ -25,12 +26,13 @@ const static glm::vec3 GRAVITY = glm::vec3(0.f, -20.f, 0.f);
 // const static float VISC_LAP = 45.f/(3.1415*pow(H, 6.f));
 class WaterSystem : public ParticleSystemBase {
  public:
-
+	
+	WaterSystem();
 	virtual ~WaterSystem() {
   }
 
   ParticleState ComputeTimeDerivative(const ParticleState& state,
-                                      float time) const override;
+                                      float time) override;
 
   void AddParticle(ParticleState& state, glm::vec3 position, glm::vec3 velocity);
  private:
@@ -39,7 +41,23 @@ class WaterSystem : public ParticleSystemBase {
 											 std::vector<float> pressures, 
 											 std::vector<float> rhos, 
 											 std::vector<glm::vec3>& forces) const;
-  float drag_constant_ = 0.3;
+	
+	// Gets the grid cell a point is in
+	glm::vec3 GetGridCell(glm::vec3 p) const;
+
+	// The width and height of the box
+	float box_width_ = 2.f; //TODO: Hardcoded in RK4Integrator and ParticleSystemNode
+	float box_height_ = 2.f;
+
+	// A grid based data structure to improve the speed of pressure/density calculations
+	std::vector<std::vector<std::vector<std::set<int>>>> grid_;
+
+  // Must divide evenly into box_width_ and box_height_
+	float grid_cell_width_ = 0.2f; 	
+	float grid_cell_height_ = 0.2f;
+
+	int grid_width_;
+	int grid_height_;
 };
 }  // namespace GLOO
 

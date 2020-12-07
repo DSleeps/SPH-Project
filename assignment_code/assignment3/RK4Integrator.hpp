@@ -11,10 +11,10 @@ class RK4Integrator : public IntegratorBase<TSystem, TState> {
 	float bound_damping_ = -0.75f;
 	float eps = 0.0f;
 
-  TState Integrate(const TSystem& system,
-                   const TState& state,
+  TState Integrate(TSystem& system,
+                   TState& state,
                    float start_time,
-                   float dt) const override {
+                   float dt) override {
     TState k_1 = system.ComputeTimeDerivative(state, start_time);
     TState k_2 = system.ComputeTimeDerivative(state + dt/2.*k_1, start_time + dt/2.);
     TState k_3 = system.ComputeTimeDerivative(state + dt/2.*k_2, start_time + dt/2.);

@@ -10,10 +10,10 @@ class IntegratorBase {
   virtual ~IntegratorBase() {
   }
 
-  virtual TState Integrate(const TSystem& system,
-                           const TState& state,
+  virtual TState Integrate(TSystem& system,
+                           TState& state,
                            float start_time,
-                           float dt) const = 0;
+                           float dt) = 0;
 };
 }  // namespace GLOO
 

@@ -74,6 +74,7 @@ class Grid {
 
 	// Specifies whether we draw cubes or a smooth surface
 	bool smooth_ = true;
+	bool smooth_normals_ = false;
 
 	// The two vertex and edge tables needed for metaballs
 	int edgeTable[256]={

@@ -52,7 +52,7 @@ class ParticleSystemNode : public SceneNode {
 	Grid grid_;
 
   float dt_;
-	float fps_ = 1.f/60.f;
+	float fps_ = 1.f/120.f;
 	float fps_pos_ = 0.f;
 
   float cur_time_;
@@ -81,7 +81,7 @@ ParticleSystemNode<TSystem>::ParticleSystemNode(
 
   Material default_material(glm::vec3(0.0f, 0.0f, 1.f),
                                      glm::vec3(0.0f, 0.0f, 1.0f),
-                                     glm::vec3(0.4f, 0.4f, 0.4f), 20.0f);
+                                     glm::vec3(0.0f, 0.0f, 0.1f), 20.0f);
   material_comp_ = std::make_shared<Material>(default_material);
   original_pos_ = state.positions;
   original_vel_ = state.velocities;
@@ -125,7 +125,7 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
 		fps_pos_ += dt_;
 	}
 
-  if (count == 10){
+  if (count == 5){
     auto particle_node = make_unique<SceneNode>();
     particle_node->CreateComponent<ShadingComponent>(shader_);
     // particle_node->CreateComponent<RenderingComponent>(sphere_mesh_);
@@ -135,7 +135,7 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
     float r_x = (((float) rand()/RAND_MAX) - 0.5f) * 0.25f;
 		float r_z = (((float) rand()/RAND_MAX) - 0.5f) * 0.25f;
     state_.positions.push_back(glm::vec3(r_x,.9,r_z));
-    state_.velocities.push_back(glm::vec3(0,-2.5,0));
+    state_.velocities.push_back(glm::vec3(0.f,-2.5f,0.f));
 
   	for (int i = 0; i < state_.positions.size(); i++) {
       SceneNode* particle = particles[i];

@@ -267,9 +267,11 @@ void Grid::CalculateSmooth(int x, int y, int z,
 		indices.push_back(vertex_size);
 		indices.push_back(vertex_size+1);
 		indices.push_back(vertex_size+2);
-		normals.push_back(glm::normalize(glm::vec3(gradients_[floor(p1.x/cell_size_x_)][floor(p1.y/cell_size_y_)][floor(p1.z/cell_size_z_)])));
-		normals.push_back(glm::normalize(glm::vec3(gradients_[floor(p2.x/cell_size_x_)][floor(p2.y/cell_size_y_)][floor(p2.z/cell_size_z_)])));
-		normals.push_back(glm::normalize(glm::vec3(gradients_[floor(p3.x/cell_size_x_)][floor(p3.y/cell_size_y_)][floor(p3.z/cell_size_z_)])));
+		if (smooth_normals_) {
+			normals.push_back(glm::normalize(glm::vec3(gradients_[floor(p1.x/cell_size_x_)][floor(p1.y/cell_size_y_)][floor(p1.z/cell_size_z_)])));
+			normals.push_back(glm::normalize(glm::vec3(gradients_[floor(p2.x/cell_size_x_)][floor(p2.y/cell_size_y_)][floor(p2.z/cell_size_z_)])));
+			normals.push_back(glm::normalize(glm::vec3(gradients_[floor(p3.x/cell_size_x_)][floor(p3.y/cell_size_y_)][floor(p3.z/cell_size_z_)])));
+	}
 	}
 }
 

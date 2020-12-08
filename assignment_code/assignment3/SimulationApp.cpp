@@ -56,7 +56,7 @@ void SimulationApp::SetupScene() {
   point_light->SetAttenuation(glm::vec3(1.0f, 0.09f, 0.032f));
   auto point_light_node = make_unique<SceneNode>();
   point_light_node->CreateComponent<LightComponent>(point_light);
-  point_light_node->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+  point_light_node->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 3.0f));
   root.AddChild(std::move(point_light_node));
 
 	auto integrator =

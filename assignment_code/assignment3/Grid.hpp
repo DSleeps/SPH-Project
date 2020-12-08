@@ -27,7 +27,7 @@ class Grid {
 	void CalculatePrimitive(int x, int y, int z,
 													std::vector<glm::vec3>& vertices,
 													std::vector<unsigned int>& indices);
-	
+
 	// This calculates a smooth surface
 	void CalculateSmooth(int x, int y, int z,
 											 std::vector<glm::vec3>& vertices,
@@ -35,7 +35,7 @@ class Grid {
 											 std::vector<glm::vec3>& normals);
 	
 	// Interpolates between two vertices
-	glm::vec3 VertexInterp(double isolevel, glm::vec3 p1, glm::vec3 p2, 
+	glm::vec3 VertexInterp(double isolevel, glm::vec3 p1, glm::vec3 p2,
 								 			 	 double valp1, double valp2);
 
  	// All of the values of each corner
@@ -62,7 +62,7 @@ class Grid {
 	// The range (number of radiuses) at which to check the influence of
 	// each point as radius * range
 	int range_ = 2;
-	
+
 	// The vector of corners in the correct order
 	std::vector<std::array<int,3>> corners_;
 
@@ -71,7 +71,7 @@ class Grid {
 
 	// A vector of all of face vertices
 	std::vector<std::array<glm::vec3, 4>> face_vertices;
-	
+
 	// Specifies whether we draw cubes or a smooth surface
 	bool smooth_ = true;
 

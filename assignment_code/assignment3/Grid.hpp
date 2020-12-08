@@ -19,7 +19,8 @@ class Grid {
 	Grid(glm::vec3 p1, glm::vec3 p2);
 	void CalculateBlobs(std::vector<glm::vec3> positions,
 											std::vector<glm::vec3>& vertices,
-											std::vector<unsigned int>& indices);
+											std::vector<unsigned int>& indices,
+											std::vector<glm::vec3>& normals);
 
  private:
  	// This calculates a single primitive of a given grid cell
@@ -30,7 +31,8 @@ class Grid {
 	// This calculates a smooth surface
 	void CalculateSmooth(int x, int y, int z,
 											 std::vector<glm::vec3>& vertices,
-											 std::vector<unsigned int>& indices);
+											 std::vector<unsigned int>& indices,
+											 std::vector<glm::vec3>& normals);
 	
 	// Interpolates between two vertices
 	glm::vec3 VertexInterp(double isolevel, glm::vec3 p1, glm::vec3 p2, 
@@ -38,6 +40,7 @@ class Grid {
 
  	// All of the values of each corner
  	std::vector<std::vector<std::vector<float>>> values_;
+ 	std::vector<std::vector<std::vector<glm::vec3>>> gradients_;
 
 	// This will be the origin of the grid box, the bottom corner
 	glm::vec3 origin_;
@@ -54,11 +57,7 @@ class Grid {
 	float cell_size_z_;
 
 	// The radius of each point
-<<<<<<< Updated upstream
 	float radius_ = 0.08f;
-=======
-	float radius_ = 0.04f;
->>>>>>> Stashed changes
 
 	// The range (number of radiuses) at which to check the influence of
 	// each point as radius * range

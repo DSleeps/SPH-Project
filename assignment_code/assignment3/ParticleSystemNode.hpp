@@ -52,7 +52,7 @@ class ParticleSystemNode : public SceneNode {
 	Grid grid_;
 
   float dt_;
-	float fps_ = 1.f/30.f;
+	float fps_ = 1.f/60.f;
 	float fps_pos_ = 0.f;
 
   float cur_time_;
@@ -125,7 +125,7 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
 		fps_pos_ += dt_;
 	}
 
-  if (count == 5){
+  if (count == 10){
     auto particle_node = make_unique<SceneNode>();
     particle_node->CreateComponent<ShadingComponent>(shader_);
     // particle_node->CreateComponent<RenderingComponent>(sphere_mesh_);
@@ -199,15 +199,22 @@ void ParticleSystemNode<TSystem>::DrawWater() {
 	p_array.clear();
 	IndexArray i_array;
 	i_array.clear();
+	NormalArray n_array;
+	n_array.clear();
 
-	grid_.CalculateBlobs(state_.positions, p_array, i_array);
+	grid_.CalculateBlobs(state_.positions, p_array, i_array, n_array);
 
 	auto positions = make_unique<PositionArray>(p_array);
   auto indices = make_unique<IndexArray>(i_array);
 
 	vertex_obj_->UpdatePositions(std::move(positions));
   vertex_obj_->UpdateIndices(std::move(indices));
-  vertex_obj_->UpdateNormals(std::move(make_unique<NormalArray>(CalculateNormals())));
+	if (n_array.size() > 0) {
+		auto normals = make_unique<NormalArray>(n_array);
+  	vertex_obj_->UpdateNormals(std::move(normals));
+	} else {
+  	vertex_obj_->UpdateNormals(std::move(make_unique<NormalArray>(CalculateNormals())));
+	}
 }
 
 } // namespace GLOO

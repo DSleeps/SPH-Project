@@ -22,10 +22,13 @@ Grid::Grid(glm::vec3 p1, glm::vec3 p2) {
 	// Initialize the value vector to all 0s
 	for (int x = 0; x < grid_x_res_; x++) {
 		values_.push_back(std::vector<std::vector<float>>());
+		gradients_.push_back(std::vector<std::vector<glm::vec3>>());
 		for (int y = 0; y < grid_y_res_; y++) {
 			values_[x].push_back(std::vector<float>());
+			gradients_[x].push_back(std::vector<glm::vec3>());
 			for (int z = 0; z < grid_z_res_; z++) {
 				values_[x][y].push_back(0.f);
+				gradients_[x][y].push_back(glm::vec3(0.f));
 			}
 		}
 	}
@@ -84,12 +87,14 @@ Grid::Grid(glm::vec3 p1, glm::vec3 p2) {
 
 void Grid::CalculateBlobs(std::vector<glm::vec3> positions,
 													std::vector<glm::vec3>& vertices,
-													std::vector<unsigned int>& indices) {
+													std::vector<unsigned int>& indices,
+													std::vector<glm::vec3>& normals) {
 	
 	for (int x = 0; x < grid_x_res_; x++) {
 		for (int y = 0; y < grid_y_res_; y++) {
 			for (int z = 0; z < grid_z_res_; z++) {
 				values_[x][y][z] = 0.f;
+				gradients_[x][y][z] = glm::vec3(0.f);
 			}
 		}
 	}
@@ -111,6 +116,7 @@ void Grid::CalculateBlobs(std::vector<glm::vec3> positions,
 				for (int z = z_l; z < z_h; z++) {
 					glm::vec3 point = glm::vec3(x*cell_size_x_, y*cell_size_y_, z*cell_size_z_);
 					values_[x][y][z] += pow(radius_,2.f)/pow(glm::distance(point, p),2.f);
+					gradients_[x][y][z] += (-2.f * (p - point) * pow(radius_,2.f))/(pow(glm::distance(point, p),4.f));
 				}
 			}
 		}
@@ -120,7 +126,7 @@ void Grid::CalculateBlobs(std::vector<glm::vec3> positions,
 		for (int y = 0; y < grid_y_res_; y++) {
 			for (int z = 0; z < grid_z_res_; z++) {
 				if (smooth_) {
-					CalculateSmooth(x, y, z, vertices, indices);
+					CalculateSmooth(x, y, z, vertices, indices, normals);
 				} else {
 					if (values_[x][y][z] >= 1.f)
 						CalculatePrimitive(x, y, z, vertices, indices);
@@ -172,7 +178,8 @@ typedef struct {
 
 void Grid::CalculateSmooth(int x, int y, int z,
 													 std::vector<glm::vec3>& vertices,
-													 std::vector<unsigned int>& indices) {
+													 std::vector<unsigned int>& indices,
+													 std::vector<glm::vec3>& normals) {
 	int cubeindex;
 	glm::vec3 vertlist[12];
 	float isolevel = 1.f;
@@ -185,7 +192,7 @@ void Grid::CalculateSmooth(int x, int y, int z,
 		float value;
 		if (x + o_x == 0 || y + o_y == 0 || z + o_z == 0 ||
 				x + o_x >= grid_x_res_ || y + o_y >= grid_y_res_ || z + o_z >= grid_z_res_) {
-			value = 0.f;		
+			value = 0.f;	
 		} else {
 			value = values_[x+o_x][y+o_y][z+o_z];
 		}
@@ -250,12 +257,19 @@ void Grid::CalculateSmooth(int x, int y, int z,
 	// Create the triangle
 	for (int i = 0; triTable[cubeindex][i] != -1; i += 3) {
 		int vertex_size = vertices.size();
-		vertices.push_back(vertlist[triTable[cubeindex][i]] + origin_);
-		vertices.push_back(vertlist[triTable[cubeindex][i+1]] + origin_);
-		vertices.push_back(vertlist[triTable[cubeindex][i+2]] + origin_);
+		glm::vec3 p1 = vertlist[triTable[cubeindex][i]];
+		glm::vec3 p2 = vertlist[triTable[cubeindex][i+1]];
+		glm::vec3 p3 = vertlist[triTable[cubeindex][i+2]];
+		
+		vertices.push_back(p1 + origin_);
+		vertices.push_back(p2 + origin_);
+		vertices.push_back(p3 + origin_);
 		indices.push_back(vertex_size);
 		indices.push_back(vertex_size+1);
 		indices.push_back(vertex_size+2);
+		normals.push_back(glm::normalize(glm::vec3(gradients_[floor(p1.x/cell_size_x_)][floor(p1.y/cell_size_y_)][floor(p1.z/cell_size_z_)])));
+		normals.push_back(glm::normalize(glm::vec3(gradients_[floor(p2.x/cell_size_x_)][floor(p2.y/cell_size_y_)][floor(p2.z/cell_size_z_)])));
+		normals.push_back(glm::normalize(glm::vec3(gradients_[floor(p3.x/cell_size_x_)][floor(p3.y/cell_size_y_)][floor(p3.z/cell_size_z_)])));
 	}
 }
 

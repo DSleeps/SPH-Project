@@ -29,6 +29,16 @@ Grid::Grid(glm::vec3 p1, glm::vec3 p2) {
 			}
 		}
 	}
+	
+	// Populate the corner set
+	corners_.push_back({0,0,1});
+	corners_.push_back({1,0,1});
+	corners_.push_back({1,0,0});
+	corners_.push_back({0,0,0});
+	corners_.push_back({0,1,1});
+	corners_.push_back({1,1,1});
+	corners_.push_back({1,1,0});
+	corners_.push_back({0,1,0});
 
 	// Populate the face set
 	face_vector_.push_back({1,0,0});
@@ -163,48 +173,28 @@ typedef struct {
 void Grid::CalculateSmooth(int x, int y, int z,
 													 std::vector<glm::vec3>& vertices,
 													 std::vector<unsigned int>& indices) {
-	// We don't need to check any of the edges
-	if (x == grid_x_res_ - 1 || y == grid_y_res_ - 1 || z == grid_z_res_ - 1)
-		return;
-
 	int cubeindex;
 	glm::vec3 vertlist[12];
 	float isolevel = 1.f;
 	
 	GRIDCELL grid;
-	// Manually specify each corner in the grid
-	grid.val[0] = (double) values_[x][y][z+1];
-	grid.p[0] = glm::vec3((x) * cell_size_x_, 
-												(y) * cell_size_y_, 
-												(z+1) * cell_size_z_);
-	grid.val[1] = (double) values_[x+1][y][z+1];
-	grid.p[1] = glm::vec3((x+1) * cell_size_x_, 
-												(y) * cell_size_y_, 
-												(z+1) * cell_size_z_);
-	grid.val[2] = (double) values_[x+1][y][z];
-	grid.p[2] = glm::vec3((x+1) * cell_size_x_, 
-												(y) * cell_size_y_, 
-												(z) * cell_size_z_);
-	grid.val[3] = (double) values_[x][y][z];
-	grid.p[3] = glm::vec3((x) * cell_size_x_, 
-												(y) * cell_size_y_, 
-												(z) * cell_size_z_);
-	grid.val[4] = (double) values_[x][y+1][z+1];
-	grid.p[4] = glm::vec3((x) * cell_size_x_, 
-												(y+1) * cell_size_y_, 
-												(z+1) * cell_size_z_);
-	grid.val[5] = (double) values_[x+1][y+1][z+1];
-	grid.p[5] = glm::vec3((x+1) * cell_size_x_, 
-												(y+1) * cell_size_y_, 
-												(z+1) * cell_size_z_);
-	grid.val[6] = (double) values_[x+1][y+1][z];
-	grid.p[6] = glm::vec3((x+1) * cell_size_x_, 
-												(y+1) * cell_size_y_, 
-												(z) * cell_size_z_);
-	grid.val[7] = (double) values_[x][y+1][z];
-	grid.p[7] = glm::vec3((x) * cell_size_x_, 
-												(y+1) * cell_size_y_, 
-												(z) * cell_size_z_);
+	int index = 0;
+	for (auto c : corners_) {
+		int o_x = c[0]; int o_y = c[1]; int o_z = c[2];
+
+		float value;
+		if (x + o_x == 0 || y + o_y == 0 || z + o_z == 0 ||
+				x + o_x >= grid_x_res_ || y + o_y >= grid_y_res_ || z + o_z >= grid_z_res_) {
+			value = 0.f;		
+		} else {
+			value = values_[x+o_x][y+o_y][z+o_z];
+		}
+		grid.val[index] = (double) value;
+		grid.p[index] = glm::vec3((x+o_x) * cell_size_x_, 
+												  		(y+o_y) * cell_size_y_, 
+												  		(z+o_z) * cell_size_z_);
+		index++;
+	}
 	
 	cubeindex = 0;
 	if (grid.val[0] < isolevel) cubeindex |= 1;

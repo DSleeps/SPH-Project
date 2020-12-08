@@ -26,7 +26,7 @@ const static glm::vec3 GRAVITY = glm::vec3(0.f, -20.f, 0.f);
 // const static float VISC_LAP = 45.f/(3.1415*pow(H, 6.f));
 class WaterSystem : public ParticleSystemBase {
  public:
-	
+
 	WaterSystem();
 	virtual ~WaterSystem() {
   }
@@ -38,10 +38,10 @@ class WaterSystem : public ParticleSystemBase {
  private:
 	void CalculatePressure(const ParticleState& state, std::vector<float>& pressures, std::vector<float>& rhos) const;
 	void CalculateForces(const ParticleState& state,
-											 std::vector<float> pressures, 
-											 std::vector<float> rhos, 
+											 std::vector<float> pressures,
+											 std::vector<float> rhos,
 											 std::vector<glm::vec3>& forces) const;
-	
+
 	// Gets the grid cell a point is in
 	glm::vec3 GetGridCell(glm::vec3 p) const;
 
@@ -53,7 +53,7 @@ class WaterSystem : public ParticleSystemBase {
 	std::vector<std::vector<std::vector<std::set<int>>>> grid_;
 
   // Must divide evenly into box_width_ and box_height_
-	float grid_cell_width_ = 0.2f; 	
+	float grid_cell_width_ = 0.2f;
 	float grid_cell_height_ = 0.2f;
 
 	int grid_width_;

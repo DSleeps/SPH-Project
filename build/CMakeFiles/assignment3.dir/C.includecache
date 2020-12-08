@@ -6,3 +6,31 @@
 
 #IncludeRegexTransform: 
 
+../external/src/glad/include/KHR/khrplatform.h
+stdint.h
+-
+inttypes.h
+-
+stdint.h
+-
+
+../external/src/glad/include/glad/glad.h
+KHR/khrplatform.h
+-
+
+/Users/kzayas/Documents/coding_stuff/6.837/final_project/SPH-Project/external/src/glad/src/glad.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+glad/glad.h
+-
+windows.h
+-
+winapifamily.h
+-
+dlfcn.h
+-
+

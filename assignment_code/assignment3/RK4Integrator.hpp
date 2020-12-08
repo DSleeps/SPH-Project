@@ -19,7 +19,7 @@ class RK4Integrator : public IntegratorBase<TSystem, TState> {
     TState k_2 = system.ComputeTimeDerivative(state + dt/2.*k_1, start_time + dt/2.);
     TState k_3 = system.ComputeTimeDerivative(state + dt/2.*k_2, start_time + dt/2.);
     TState k_4 = system.ComputeTimeDerivative(state + dt*k_3, start_time + dt);
-		
+
 		// Check the boundary conditions (ie where the box is)
 		TState new_state = state + (dt/6.) * (k_1 + 2*k_2 + 2*k_3 + k_4);
 		for (int i = 0; i < new_state.positions.size(); i++) {

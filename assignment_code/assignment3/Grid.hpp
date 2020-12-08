@@ -54,7 +54,11 @@ class Grid {
 	float cell_size_z_;
 
 	// The radius of each point
+<<<<<<< Updated upstream
 	float radius_ = 0.08f;
+=======
+	float radius_ = 0.04f;
+>>>>>>> Stashed changes
 
 	// The range (number of radiuses) at which to check the influence of
 	// each point as radius * range

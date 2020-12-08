@@ -64,14 +64,14 @@ void SimulationApp::SetupScene() {
   WaterSystem base;
   ParticleState state;
 
-  int particle_number = 2000;
-	for (int i = 0; i < particle_number; i++) {
-		float r_x = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
-		float r_y = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
-		float r_z = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
-
-		base.AddParticle(state, glm::vec3(r_x, r_y, r_z), glm::vec3(r_x, r_y, r_z));
-	}
+  // int particle_number = 2000;
+	// for (int i = 0; i < particle_number; i++) {
+	// 	float r_x = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
+	// 	float r_y = (((float) rand()/RAND_MAX) - 0.5f) * 1.5f;
+	// 	float r_z = (((float) rand()/RAND_MAX) - 0.5f) * 2.f;
+  //
+	// 	base.AddParticle(state, glm::vec3(r_x, r_y, r_z), glm::vec3(r_x, r_y, r_z));
+	// }
 
   auto particle_node =
              make_unique<ParticleSystemNode<WaterSystem>>

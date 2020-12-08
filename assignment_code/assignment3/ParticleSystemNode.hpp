@@ -56,6 +56,7 @@ class ParticleSystemNode : public SceneNode {
 	float fps_pos_ = 0.f;
 
   float cur_time_;
+  int count = 0;
 
 	float box_width_ = 2.f; //TODO: This is also hardcoded in RK4 integrator and WaterSystem
 	float box_height_ = 2.f;
@@ -124,10 +125,33 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
 		fps_pos_ += dt_;
 	}
 
-	for (int i = 0; i < state_.positions.size(); i++) {
-    SceneNode* particle = particles[i];
-    particle->GetTransform().SetPosition(state_.positions[i]);
+  if (count == 5){
+    auto particle_node = make_unique<SceneNode>();
+    particle_node->CreateComponent<ShadingComponent>(shader_);
+    // particle_node->CreateComponent<RenderingComponent>(sphere_mesh_);
+    particle_node->CreateComponent<MaterialComponent>(material_comp_);
+    particles.push_back(particle_node.get());
+    AddChild(std::move(particle_node));
+    float r_x = (((float) rand()/RAND_MAX) - 0.5f) * 0.25f;
+		float r_z = (((float) rand()/RAND_MAX) - 0.5f) * 0.25f;
+    state_.positions.push_back(glm::vec3(r_x,.9,r_z));
+    state_.velocities.push_back(glm::vec3(0,-1,0));
+
+  	for (int i = 0; i < state_.positions.size(); i++) {
+      SceneNode* particle = particles[i];
+      particle->GetTransform().SetPosition(state_.positions[i]);
+    }
+    count = 0;
+
+    if (state_.positions.size() % 250 == 0){
+      std::cout << state_.velocities.size() << '\n';
+    }
+
   }
+  count ++;
+
+
+
 }
 
 template<class TSystem>

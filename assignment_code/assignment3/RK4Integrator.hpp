@@ -8,7 +8,7 @@ template <class TSystem, class TState>
 class RK4Integrator : public IntegratorBase<TSystem, TState> {
 	float box_width_ = 2.f; //TODO: This is also hardcoded into ParticleSystemNode
 	float box_height_ = 2.f;
-	float bound_damping_ = -0.75f;
+	float bound_damping_ = -0.3f;
 	float eps = 0.0f;
 
   TState Integrate(TSystem& system,

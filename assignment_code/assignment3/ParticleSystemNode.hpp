@@ -135,7 +135,7 @@ void ParticleSystemNode<TSystem>::Update(double delta_time) {
     float r_x = (((float) rand()/RAND_MAX) - 0.5f) * 0.25f;
 		float r_z = (((float) rand()/RAND_MAX) - 0.5f) * 0.25f;
     state_.positions.push_back(glm::vec3(r_x,.9,r_z));
-    state_.velocities.push_back(glm::vec3(0,-1,0));
+    state_.velocities.push_back(glm::vec3(0,-2.5,0));
 
   	for (int i = 0; i < state_.positions.size(); i++) {
       SceneNode* particle = particles[i];
